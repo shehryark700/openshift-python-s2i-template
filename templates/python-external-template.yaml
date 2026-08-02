@@ -1,0 +1,115 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: ocp-dashboard-template
+  annotations:
+    description: "Template for deploying the Python-based OCP Dashboard application."
+    tags: "python, dashboard, openshift"
+objects:
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    name: ${NAME}
+    labels:
+      app: ${NAME}
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    name: ${NAME}
+    labels:
+      app: ${NAME}
+  spec:
+    source:
+      type: Git
+      git:
+        uri: ${GIT_REPO}
+      contextDir: ${CONTEXT_DIR}
+    strategy:
+      type: Source
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          namespace: openshift
+          name: python:3.12-minimal-ubi9
+        env:
+        - name: APP_FILE
+          value: ${APP_FILE}
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${NAME}:latest
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    name: ${NAME}
+    labels:
+      app: ${NAME}
+  spec:
+    replicas: 1
+    selector:
+      app: ${NAME}
+    template:
+      metadata:
+        labels:
+          app: ${NAME}
+      spec:
+        containers:
+        - name: ${NAME}
+          image: ${NAME}:latest
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          env:
+          - name: APP_FILE
+            value: ${APP_FILE}
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${NAME}
+        from:
+          kind: ImageStreamTag
+          name: ${NAME}:latest
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: ${NAME}
+    labels:
+      app: ${NAME}
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      targetPort: 8080
+    selector:
+      app: ${NAME}
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    name: ${NAME}
+    labels:
+      app: ${NAME}
+  spec:
+    port:
+      targetPort: 8080-tcp
+    to:
+      kind: Service
+      name: ${NAME}
+parameters:
+- name: NAME
+  value: "ocp-dashboard-app"
+  required: true
+- name: GIT_REPO
+  value: "https://github.com/kn255002/Redhat-OpenShift"
+  required: true
+- name: CONTEXT_DIR
+  value: "ocp-dashboard"
+  required: true
+- name: APP_FILE
+  value: "HealthDashboard.py"
+  required: true
