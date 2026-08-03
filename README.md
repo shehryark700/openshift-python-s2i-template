@@ -1,12 +1,8 @@
 # OpenShift Python S2I Deployment Template
 
 ## Overview
-
 This project demonstrates how to deploy a Python application on OpenShift using Source-to-Image (S2I), OpenShift Templates, BuildConfigs, ImageStreams, DeploymentConfigs, Services, and Routes.
-
 The application source code is pulled directly from GitHub and automatically built using the OpenShift Python builder image.
-
----
 
 ## Features
 
@@ -20,39 +16,9 @@ The application source code is pulled directly from GitHub and automatically bui
 * Python Application Deployment
 * Parameterized Template
 
----
-
 ## Architecture
 
-```text
-GitHub Repository
-        │
-        ▼
-BuildConfig
-        │
-        ▼
-Python S2I Builder Image
-        │
-        ▼
-ImageStream
-        │
-        ▼
-DeploymentConfig
-        │
-        ▼
-Pod
-        │
-        ▼
-Service
-        │
-        ▼
-Route
-        │
-        ▼
-User
-```
-
----
+![OpenShift Template Deployment Architecture](./openshift-template-architecture.svg)
 
 ## Prerequisites
 
@@ -60,8 +26,6 @@ User
 * OpenShift CLI (oc)
 * Git
 * GitHub Repository
-
----
 
 ## Deploy
 
@@ -107,8 +71,6 @@ Verify route:
 oc get route
 ```
 
----
-
 ## Technologies Used
 
 * OpenShift
@@ -123,8 +85,6 @@ oc get route
 * Service
 * Route
 
----
-
 ## Skills Demonstrated
 
 * OpenShift Administration
@@ -136,9 +96,5 @@ oc get route
 * Route Configuration
 * OpenShift CLI Operations
 
----
-
 ## Author
-
 Shehryar Khan
-
